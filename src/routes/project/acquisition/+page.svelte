@@ -2,6 +2,8 @@
     let width: number, height: string;
     
     $: height = (width*(3/4)) + 'px';
+
+    
 </script>
 
 
@@ -34,9 +36,14 @@
 			</fieldset>
 		</form>
 	</div>
-	<div class="col-9 bg-dark" style="height:{height}" bind:offsetWidth={width}>
-
+	<div class="col-9 bg-dark">
+    <div class="video-container">
+      <video id="video-preview" ></video>
+      <button id="record-btn">Record</button>
+      <button id="stop-btn">Stop</button>
     </div>
+  </div>
+
 </div>
 
 <hr class="my-4">
