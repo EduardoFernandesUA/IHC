@@ -16,8 +16,8 @@
 </script>
 
 <div class="" bind:this={body}>
-	<nav class="navbar navbar-expand-lg bg-body-tertiary" bind:this={nav}>
-		<div class="container-fluid">
+	<nav class="navbar navbar-expand-xl bg-body-tertiary" bind:this={nav}>
+		<div class="container">
 			<a class="navbar-brand" href="/">MFDAA</a>
 			<button
 				class="navbar-toggler"
@@ -33,7 +33,7 @@
 			<div class="collapse navbar-collapse" id="navbarSupportedContent">
 				<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 					<li class="nav-item">
-						<a class="nav-link {path == '/browse' ? 'active' : ''}" href="/browse">Browse</a>
+						<a class="nav-link {path == '/community' ? 'active' : ''}" href="/community">Community</a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link {path == '/myprojects' ? 'active' : ''}" href="/myprojects"

@@ -4,8 +4,8 @@
 <div class="my-3">
 	<div class="row align-items-center">
 		<div class="col-6" style="height:500px;background-image: linear-gradient(red, yellow);"></div>
-		<div class="col-6">
-			<h1 class="" style="">Modular Framework for Data Acquisition & Anotatio</h1>
+		<div class="col-6 p-5">
+			<h1 class="" style="">Modular Framework for Data Acquisition & Anotation</h1>
 			<h5>A place where you can explore non verbal cues!</h5>
 		</div>
 	</div>
