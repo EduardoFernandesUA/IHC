@@ -26,9 +26,7 @@
         chunks.push(event.data);
       });
 
-      if (isRecording) {
-        recorder.start(); // starts recording
-      }
+      
     } catch (error) {
       console.error('Error opening camera:', error);
     }
@@ -36,14 +34,14 @@
 
   async function startRecording() {
     isRecording = true;
-    if (!isPlaying) {
+    if (!isPlaying) { // if cam not open, open it
       await openCamera();
     }
 
     const startRecord = document.getElementById('record');
     startRecord.style.display = 'none';
 
-    if (recorder && recorder.state === 'inactive') {
+    if (recorder && recorder.state === 'inactive') { // if cam is open, start recording
       countDown = parseInt(document.getElementById('count-down-input').value);
       duration = parseInt(document.getElementById('duration-input').value);
 
@@ -90,17 +88,22 @@
   }
 
   function downloadVideo() {
-    const blob = new Blob(chunks, { type: 'video/webm' });
+    const blob = new Blob(chunks, { type: 'video/mp4' });
     const url = URL.createObjectURL(blob);
+    
+    // Prompt the user for the filename
+    const filename = prompt('Enter a name for the video file:', 'recorded-video');
+
     const a = document.createElement('a');
     document.body.appendChild(a);
     a.style = 'display: none';
     a.href = url;
-    a.download = 'recorded-video.webm';
+    a.download = filename + '.mp4'; // Add the filename to the download link
     a.click();
     window.URL.revokeObjectURL(url);
-    chunks = []; 
-  }
+    chunks = []; // Clear the chunks array
+  } 
+
   
 </script>
 
@@ -173,7 +176,7 @@
             <th scope="row">1</th>
             <td>video_#1</td>
             <td>ThumbsUp</td>
-            <td>4</td>
+            <td>3</td>
           </tr>
           <tr>
             <th scope="row">2</th>
