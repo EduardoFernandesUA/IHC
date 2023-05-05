@@ -8,28 +8,26 @@
   let chunks = [];
   let isPlaying = false;
   let isRecording = false;
+  let countDown = 0;
+  let duration = 0;
 
   async function openCamera() {
     isPlaying = true;
     try {
-      // Get access to the camera
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const videoElement = document.querySelector('video');
+      // cam
+      stream = await navigator.mediaDevices.getUserMedia({ video: true }); // only video no audio
+      const videoElement = document.querySelector('video'); // only vid
 
-      // Display the camera stream in a video element
-      videoElement.srcObject = stream;
+      videoElement.srcObject = stream; 
+ 
+      recorder = new MediaRecorder(stream); 
 
-      // Create a MediaRecorder instance to record the video
-      recorder = new MediaRecorder(stream);
-
-      // Listen for data available events and collect the video chunks
-      recorder.addEventListener('dataavailable', event => {
+      recorder.addEventListener('dataavailable', event => { 
         chunks.push(event.data);
       });
 
-      // Start recording if already requested
       if (isRecording) {
-        recorder.start();
+        recorder.start(); // starts recording
       }
     } catch (error) {
       console.error('Error opening camera:', error);
@@ -39,28 +37,46 @@
   async function startRecording() {
     isRecording = true;
     if (!isPlaying) {
-      // If camera is not open, open it
       await openCamera();
     }
 
-    // Show the pause button and hide the play button
     const startRecord = document.getElementById('record');
     startRecord.style.display = 'none';
 
-    // Start recording if recorder is not already recording
     if (recorder && recorder.state === 'inactive') {
-      try {
-        recorder.start();
-        console.log('Recording video ...');
-      } catch (error) {
-        console.error('Error starting recording:', error);
-      }
+      countDown = parseInt(document.getElementById('count-down-input').value);
+      duration = parseInt(document.getElementById('duration-input').value);
+
+      const countDownText = document.getElementById('count-down-text');
+      const recordingText = document.getElementById('recording-text');
+      countDownText.innerHTML = countDown;
+
+      const intervalId = setInterval(() => {
+        countDown--;
+        countDownText.innerHTML = countDown;
+        if (countDown <= 0) {
+          clearInterval(intervalId);
+          countDownText.style.display = "none";
+
+          try {
+            recordingText.innerHTML = "Recording...";
+            recorder.start();
+            console.log('Recording video ...');
+
+            setTimeout(() => {
+              stopRecording();
+              recordingText.innerHTML = "";
+            }, duration * 1000);
+          } catch (error) {
+            console.error('Error starting recording:', error);
+          }
+        }
+      }, 1000);
     }
-  }
+}
 
   async function stopRecording() {
     if (recorder && recorder.state === 'recording') {
-      // Stop recording and wait for the "stop" event to fire
       recorder.stop();
       isRecording = false;
       console.log('Stopped recording video.');
@@ -83,11 +99,8 @@
     a.download = 'recorded-video.webm';
     a.click();
     window.URL.revokeObjectURL(url);
-    chunks = []; // Clear the chunks array
+    chunks = []; 
   }
-
-
-
   
 </script>
 
@@ -106,13 +119,13 @@
 					<button class="btn btn-dark input-group-text">+</button>
 				</div>
 				<div class="input-group">
-					<span class="input-group-text w-75">Count Down</span>
-					<input type="number" aria-label="First name" class="form-control" value="3"/>
-				</div>
-				<div class="input-group">
-					<span class="input-group-text w-75">Duration</span>
-					<input type="number" aria-label="First name" class="form-control" value="3"/>
-				</div>
+          <span class="input-group-text w-75">Count Down</span>
+          <input type="number" aria-label="First name" class="form-control" value="3" id="count-down-input"/>
+        </div>
+        <div class="input-group">
+          <span class="input-group-text w-75">Duration</span>
+          <input type="number" aria-label="First name" class="form-control" value="3" id="duration-input"/>
+        </div>
 				<div class="input-group">
 					<span class="input-group-text w-75">Repetitions</span>
 					<input type="number" aria-label="First name" class="form-control" value="2"/>
@@ -121,6 +134,10 @@
         {#if isRecording}
           <button id="StopRecord" type="submit" class="btn btn-dark w-100 text-center mt-2" on:click={stopRecording}>Stop Record</button>
         {/if}
+
+        <br>
+        <p id="count-down-text" style="text-align:center"></p>
+        <p id="recording-text" style="text-align:center"></p>
 	</fieldset>
 		</form>
 	</div>
