@@ -49,7 +49,7 @@
       </div>
         <div class="col-8 bg-dark" style="height:{height}" bind:offsetWidth={width}>
             <div class="icon-container">
-                <img src="/src/routes/img/play.png" alt="Icon" class="icon" style="filter: brightness(0) saturate(100%) invert(100%); display: flex; justify-content: center; align-items: center;top: 10%;transform: translateY(200%);">
+                <img src="/src/routes/img/play.png" alt="Icon" class="icon" style="display: flex; justify-content: center; align-items: center;top: 10%;transform: translateY(200%);">
             </div>
 
            <p  style="margin-top: 380px;text-align:center">
@@ -73,7 +73,6 @@
     .icon {
       display: block;
       margin: auto;
-      filter: invert(1);
       max-width: 10%;
       max-height: 10%;
     }

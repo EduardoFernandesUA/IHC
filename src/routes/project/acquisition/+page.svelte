@@ -9,8 +9,6 @@
   let isPlaying = false;
   let isRecording = false;
 
-
-
   async function openCamera() {
     isPlaying = true;
     try {
@@ -29,42 +27,65 @@
         chunks.push(event.data);
       });
 
-      // Start recording
-      recorder.start();
+      // Start recording if already requested
+      if (isRecording) {
+        recorder.start();
+      }
     } catch (error) {
       console.error('Error opening camera:', error);
     }
   }
 
   async function startRecording() {
-  isRecording = true;
-  if (!isPlaying) {
-    // If camera is not open, open it
-    await openCamera();
-  }
+    isRecording = true;
+    if (!isPlaying) {
+      // If camera is not open, open it
+      await openCamera();
+    }
 
-  // Show the pause button and hide the play button
-  const startRecord = document.getElementById('record');
-  startRecord.style.display = 'none';
+    // Show the pause button and hide the play button
+    const startRecord = document.getElementById('record');
+    startRecord.style.display = 'none';
 
-  if (recorder && recorder.state === 'inactive') {
-    try {
-      recorder.start();
-      console.log('Recording video ...');
-    } catch (error) {
-      console.error('Error starting recording:', error);
+    // Start recording if recorder is not already recording
+    if (recorder && recorder.state === 'inactive') {
+      try {
+        recorder.start();
+        console.log('Recording video ...');
+      } catch (error) {
+        console.error('Error starting recording:', error);
+      }
     }
   }
-}
-
 
   async function stopRecording() {
     if (recorder && recorder.state === 'recording') {
+      // Stop recording and wait for the "stop" event to fire
       recorder.stop();
       isRecording = false;
       console.log('Stopped recording video.');
+      recorder.addEventListener('stop', () => {
+        // Ask user if they want to download the video
+        if (confirm('Do you want to download the video?')) {
+          downloadVideo();
+        }
+      });
     }
   }
+
+  function downloadVideo() {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style = 'display: none';
+    a.href = url;
+    a.download = 'recorded-video.webm';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    chunks = []; // Clear the chunks array
+  }
+
 
 
   
@@ -103,7 +124,7 @@
 	</fieldset>
 		</form>
 	</div>
-	<div class="col-8 " style="height:{height}" bind:offsetWidth={width}>
+	<div class="col-8" style="height:{height}" bind:offsetWidth={width}>
     <div class="icon-container">
       <video width="2640" height="480" style="height:{height}" bind:offsetWidth={width} autoplay muted></video>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
