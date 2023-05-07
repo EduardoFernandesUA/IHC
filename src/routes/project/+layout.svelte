@@ -15,6 +15,9 @@
 <slot />
 
 <style>
+    nav a {
+        background-color: #f8f9fa;
+    }
     nav .active {
         background-color: black;
         color: white;

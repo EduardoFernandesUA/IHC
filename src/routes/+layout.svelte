@@ -16,7 +16,9 @@
 </script>
 
 <div class="" bind:this={body}>
-	<nav class="navbar navbar-expand-xl bg-body-tertiary" bind:this={nav}>
+
+	<nav class="navbar navbar-expand-lg bg-body-tertiary" bind:this={nav}>
+
 		<div class="container">
 			<a class="navbar-brand" href="/">MFDAA</a>
 			<button
