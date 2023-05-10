@@ -131,21 +131,16 @@
   }
 
   function previewVideo() {
-    // Get the video element from the modal
     const modalVideo = document.getElementById('previewVideo');
       
-    // Create a URL for the recorded video
     const blob = new Blob(chunks, { type: 'video/webm' });
     const videoURL = URL.createObjectURL(blob);
 
-    // Set the source of the modal video element to the URL
     modalVideo.src = videoURL;
 
-    // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
     modal.show();
 
-    // Add event listener to the download button
     const downloadButton = document.getElementById('download-button');
     downloadButton.removeEventListener('click', downloadVideo);
     downloadButton.addEventListener('click', downloadVideo);
@@ -161,27 +156,28 @@
     const blob = new Blob(chunks, { type: 'video/mp4' });
     const url = URL.createObjectURL(blob);
     
-    // Prompt the user for the filename
+    // get users input for video name
     const filename = prompt('Enter a name for the video file:', 'recorded-video');
+    // if prompt is cancelled, skip the file save
+    if (!filename) {
+      return;
+    }
     const a = document.createElement('a');
     document.body.appendChild(a);
     a.style = 'display: none';
     a.href = url;
-    a.download = filename + '.mp4'; // Add the filename to the download link
+    a.download = filename + '.mp4';
     a.click();
     window.URL.revokeObjectURL(url);
-    chunks = []; // Clear the chunks array
+    chunks = []; 
     
-
-    // Create a new record object
     const newRecord = {
       id: records.length + 1,
       name: filename,
-      class: 'ThumbsUp', // Assuming a default value
-      duration: duration // Assuming the duration is available in the surrounding scope
+      class: 'ThumbsUp', 
+      duration: duration
     };
 
-    // Add the new record to the records array
     records.push(newRecord);
 
     // list the records on the table
@@ -193,6 +189,7 @@
     idCell.innerHTML = newRecord.id;
     tableRow.appendChild(idCell);
 
+    // add mame to recorded video
     const nameCell = document.createElement('td');
     const nameInput = document.createElement('input');
     nameInput.setAttribute('type', 'text');
@@ -202,6 +199,7 @@
     nameCell.appendChild(nameInput);
     tableRow.appendChild(nameCell);
 
+    // add class to recorded video
     const classCell = document.createElement('td');
     const classSelect = document.createElement('select');
     classSelect.setAttribute('value', newRecord.class);
@@ -221,14 +219,36 @@
     classCell.appendChild(classSelect);
     tableRow.appendChild(classCell);
 
+    // add duration to recorded video
     const durationCell = document.createElement('td');
     durationCell.innerHTML = newRecord.duration;
     tableRow.appendChild(durationCell);
-    
     tableBody.appendChild(tableRow);
 
-    
+    // add delete button to recorded video
+    const deleteCell = document.createElement('td');
+    const deleteButton = document.createElement('button');
+    deleteButton.setAttribute('class', 'btn btn-danger');
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i>'; // Replace the button content with the trash can icon
+    deleteButton.addEventListener('click', () => deleteRecord(newRecord.id));
+    deleteCell.appendChild(deleteButton);
+    tableRow.appendChild(deleteCell);
+
   }
+
+  function deleteRecord(id) {
+    const record = records.find(r => r.id === id);
+    const index = records.indexOf(record);
+    records.splice(index, 1);
+
+    const tableBody = document.querySelector('tbody');
+    const tableRow = document.getElementById(`record-${id}`);
+    
+    if (tableBody && tableRow) {
+      tableBody.removeChild(tableRow);
+    }
+  }
+
 
 </script>
 
@@ -256,7 +276,7 @@
         </div>
 				<div class="input-group">
 					<span class="input-group-text w-75">Repetitions</span>
-					<input type="number" aria-label="First name" class="form-control" value="2"/>
+					<input type="number" aria-label="First name" class="form-control" value="1"/>
 				</div>
         {#if !isPlaying}
         <button id="record" type="submit" class="btn btn-dark w-100 text-center mt-2" on:click={openCamera}>Open Camera</button>
@@ -276,9 +296,9 @@
       <video width="2640" height="480" style="height:{height}" bind:offsetWidth={width} autoplay muted></video>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       {#if !isPlaying}
-       <!-- <img id="play" src="/src/routes/img/play.png" alt="Icon" class="icon" style="display: flex; justify-content: center; align-items: center; margin: 0 auto;" on:click={openCamera}>
+        <!-- <img id="play" src="/src/routes/img/play.png" alt="Icon" class="icon" style="" on:click={openCamera}>
 
-        <!--<button id="play" class="icon" style="display: flex; justify-content: center; align-items: center;margin-right:880px;margin-top:170px;" on:click={openCamera}>Start Camera</button> -->
+ <button id="play" class="icon" style="display: flex; justify-content: center; align-items: center;margin-right:880px;margin-top:170px;" on:click={openCamera}>Start Camera</button> -->
       {:else}
         <!-- <img id="pause" src="/src/routes/img/stop.png" alt="Icon" class="icon" style="display: flex; justify-content: center; align-items: center;" on:click={stopCamera}> -->
       {/if} </div>
@@ -324,7 +344,7 @@
     </thead>
     <tbody>
       {#each records as record (record.id)}
-        <tr>
+        <tr id="record-{record.id}">
           <th scope="row">{record.id}</th>
           <td>
             <input type="text" id="name-input-{record.id}" bind:value={record.name} on:blur={() => saveName(record.id)} />
@@ -337,13 +357,20 @@
             </select>
           </td>
           <td>{record.duration}</td>
+          <td>
+            <button class="btn btn-danger" on:click={() => deleteRecord(record.id)}>
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
         </tr>
       {/each}
+
     </tbody>
     
   </table>
 </div>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"  />
 <style>
   .icon-container {
     display: flex;
@@ -352,15 +379,8 @@
     
   }
 
-  .icon {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-
   #play {
     display: block;
-    margin: 0 auto;
     max-width: 10%;
     max-height: 10%;
   }
