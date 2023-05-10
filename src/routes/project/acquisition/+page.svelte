@@ -5,8 +5,6 @@
 
   let records = [
     { id: 1, name: 'video_#1', class: 'ThumbsUp', duration: 3 },
-    { id: 2, name: 'ThumbsDown123', class: 'ThumbsDown', duration: 3.5 },
-    { id: 3, name: 'video589', class: 'PeaceSign', duration: 8 }
   ];
 
   function editName(id) {
