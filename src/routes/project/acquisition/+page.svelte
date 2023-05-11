@@ -311,7 +311,7 @@
           <button type="button" class="btn-close" on:click={() => closeModal()} aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <video id="previewVideo" controls class="w-100">
+          <video id="previewVideo" controls class="w-100" autoplay>
             <track kind="captions" />
           </video>
         </div>
