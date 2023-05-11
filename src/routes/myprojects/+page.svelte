@@ -1,5 +1,7 @@
 <link rel="stylesheet" href="src/routes/myprojects/styles.css">
 <script>
+	import { comment } from "svelte/internal";
+
   
   let projects = [
     {
@@ -38,7 +40,7 @@
     projects.push({
       name: projectName,
       description: projectDescription,
-      image: 'src/routes/images/gradient3.jpeg',
+      image: 'src/routes/images/gradient4.jpeg',
       link: '/project/acquisition',
       technologies: ['Svelte', 'JavaScript', 'HTML', 'CSS'],
       role: 'Facial Queues',
@@ -55,35 +57,44 @@
     load_content();
   }
 
-  function load_content() {
-  let project_list = document.querySelector("#project_list");
-  let latestProject = projects[projects.length - 1];
+  function goToProjectLink(link) {
+  console.log(link);
+  window.open(link, '_blank');
+}
 
-  const projectCard = `
-  <div class="project-card custom-project-card" on:click="goToProjectLink('${latestProject.link}')">
-      <img src="${latestProject.image}" alt="${latestProject.name}" />
-      <div class="project-card-content">
-        <h2>${latestProject.name}</h2>
-        <p>${latestProject.description}</p>
-        <div class="project-info">
-          <button class="project-info-button custom-project-info-button" on:click="toggleProjectInfo(event, ${projects.length - 1})">
-            Go to Project
-          </button>
+function load_content() {
+  let project_list = document.querySelector("#project_list");
+  project_list.innerHTML = '';
+
+  projects.forEach((project) => {
+    console.log(project);
+    const projectCard = `
+      <div class="project-card custom-project-card" on:click="goToProjectLink('${project.link}')">
+        <img src="${project.image}" alt="${project.name}" />
+        <div class="project-card-content">
+          <h2>${project.name}</h2>
+          <p>${project.description}</p>
+          <div class="project-info">
+            <button class="project-info-button custom-project-info-button" on:click="goToProjectLink('${project.link}')">
+              Go to Project
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `;
+    `;
 
-  project_list.innerHTML += projectCard;
+    alert("Project created successfully! You are being redirected to the project page.");
+    goToProjectLink(project.link);
+
+    project_list.innerHTML += projectCard;
+
+  });
 }
+
 
 
   
   let projectInfo = '';
-
-  function goToProjectLink(link) {
-    window.open(link, '_blank');
-  }
 
   function toggleProjectInfo(event, index) {
     event.stopPropagation();
@@ -213,7 +224,7 @@
     <h2>{project.name}</h2>
     <p>{project.description}</p>
     <div class="project-info">
-      <button class="project-info-button" style= "height: 30px" on:click={(e) => toggleProjectInfo(e, index)}>
+      <button class="project-info-button" style= "height: 30px" on:click={() => goToProjectLink(project.link)}>
         Go to Project
       </button>
       {#if projectInfo}
