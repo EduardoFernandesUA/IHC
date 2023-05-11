@@ -15,15 +15,14 @@
 		<div class="col-6" style="height:500px;background-image: linear-gradient(blue, cyan);"></div>
 		<div class="col-6 p-5" >
 			<h1 class="" style="">Modular Framework for Data Acquisition & Anotation</h1>
-			<h5>A place where you can explore non verbal cues!</h5>
+			<h5>Unleash insights hidden in Non-Verbal Communications!</h5>
 		</div>
 	</div>
 
 	<hr class="my-5">
 
 	<div class="">
-		<h1 class="text-center">MDFAA Can Offers</h1><br>
-		<h4 style="text-align:center">Unleash insights hidden in Non-Verbal Communications!</h4><br>
+		<h1 class="text-center">MDFAA Offers</h1><br>
 		<div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
 			<div class="col">
 			  <div class="card h-100">
