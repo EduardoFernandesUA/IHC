@@ -12,7 +12,8 @@
 
 <div class="my-3">
 	<div class="row align-items-center">
-		<div class="col-6" style="height:500px;background-image: linear-gradient(blue, cyan);"></div>
+		<!-- <div class="col-6" style="height:500px;background-image: linear-gradient(blue, cyan);"></div> -->
+		<video class="col-6" src="/demo.mp4" autoplay loop height="500" width="500"></video>
 		<div class="col-6 p-5" >
 			<h1 class="" style="">Modular Framework for Data Acquisition & Anotation</h1>
 			<h5>Unleash insights hidden in Non-Verbal Communications!</h5>
