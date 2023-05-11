@@ -12,6 +12,7 @@
 			<input type="text" class="form-control" placeholder="search" />
 		</div>
 	</div>
+	<hr class="mbg-white border-3 opacity-100" style="border-color: #eee;">
 
 	<div class="">
 		<div class="row row-cols-1 row-cols-md-3 g-4">
