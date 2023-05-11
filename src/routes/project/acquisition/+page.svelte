@@ -165,7 +165,7 @@
     a.style = 'display: none';
     a.href = url;
     a.download = filename + '.mp4';
-    a.click();
+    // a.click();
     window.URL.revokeObjectURL(url);
     chunks = []; 
     
