@@ -5,6 +5,7 @@
   
   let projects = [
     {
+      id: generateRandomId(),
       name: 'Project 1 - Hand Gestures',
       description: 'Project that aims to detect hand gestures and classify them into different categories: thumbs up, thumbs down and peace. It can also extract features using the MediaPipe library.',
       image: 'src/routes/images/gradient.jpeg',
@@ -14,6 +15,7 @@
       created: '3 months ago'
     },
     {
+      id: generateRandomId(),
       name: 'Project 2 - Face Detection',
       description: 'This project can support face detection using the MediaPipe library. The feature extraction aims to detect the facial queues of the user detecting different face points.',
       image: 'src/routes/images/gradient2.jpeg',
@@ -23,6 +25,7 @@
       created: '6 months ago'
     },
     {
+      id: generateRandomId(),
       name: 'Project 3 - Hand & Face Recognition',
       description: 'This project can support face  and also hand detection using the MediaPipe library. It is a combination of project 1 and 2 previously created',
       image: 'src/routes/images/gradient3.jpeg',
@@ -33,11 +36,23 @@
     }
   ];
 
+  // Function to generate a random ID
+  function generateRandomId() {
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let id = '';
+    for (let i = 0; i < 10; i++) {
+      id += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return id;
+  }
+
+
   function create_project() {
     let projectName = document.querySelector("#name").value;
     let projectDescription = document.querySelector("#description").value;
 
     projects.push({
+      id: generateRandomId(),
       name: projectName,
       description: projectDescription,
       image: 'src/routes/images/gradient4.jpeg',
@@ -58,38 +73,49 @@
   }
 
   function goToProjectLink(link) {
-  console.log(link);
-  window.open(link, '_blank');
-}
 
-function load_content() {
-  let project_list = document.querySelector("#project_list");
-  project_list.innerHTML = '';
+    console.log(link);
+    window.open(link, '_blank');
+  }
 
-  projects.forEach((project) => {
-    console.log(project);
-    const projectCard = `
-      <div class="project-card custom-project-card" on:click="goToProjectLink('${project.link}')">
-        <img src="${project.image}" alt="${project.name}" />
-        <div class="project-card-content">
-          <h2>${project.name}</h2>
-          <p>${project.description}</p>
-          <div class="project-info">
-            <button class="project-info-button custom-project-info-button" on:click="goToProjectLink('${project.link}')">
-              Go to Project
-            </button>
+  function goToProject(link, projectId) {
+    console.log(link);
+    window.open(link + '?id=' + projectId , '_blank');
+  }
+
+  function load_content() {
+    let project_list = document.querySelector("#project_list");
+    project_list.innerHTML = '';
+    let projectIds = [];
+    
+
+    projects.forEach((project) => {
+      const projectId = generateRandomId(); 
+      console.log(projectId);
+      const projectCard = `
+        <div class="project-card custom-project-card" onclick="window.open('/project/acquisition?id=${project.id}', '_blank')">
+          <img src="${project.image}" alt="${project.name}" />
+          <div class="project-card-content">
+            <h2>${project.name}</h2>
+            <p>${project.description}</p>
+            <div class="project-info">
+              <button class="project-info-button custom-project-info-button" onclick="window.open('/project/acquisition?id=${project.id}', '_blank')">
+                Go to Project
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
+      `;
+
+      project_list.innerHTML += projectCard;
+      projectIds.push(projectId);
+    });
 
     alert("Project created successfully! You are being redirected to the project page.");
-    goToProjectLink(project.link);
+    goToProjectLink('/project/acquisition?id=' + projectIds[projectIds.length - 1]);
+  }
 
-    project_list.innerHTML += projectCard;
 
-  });
-}
 
 
 
@@ -218,13 +244,13 @@ function load_content() {
 
 <div class="projects-container" id="project_list">
 {#each projects as project, index}
-<div class="project-card" on:click={() => goToProjectLink(project.link)}>
+<div class="project-card" on:click={() => goToProject(project.link, project.id)}>
   <img src={project.image} alt={project.name} />
   <div class="project-card-content">
     <h2>{project.name}</h2>
     <p>{project.description}</p>
     <div class="project-info">
-      <button class="project-info-button" style= "height: 30px" on:click={() => goToProjectLink(project.link)}>
+      <button class="project-info-button" style= "height: 30px" on:click={() => goToProject(project.link, project.id)}>
         Go to Project
       </button>
       {#if projectInfo}
