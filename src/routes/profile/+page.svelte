@@ -183,6 +183,7 @@
 	
 	/* profile page: */
 	.card-client {
+	margin-top: 15px;
 	background: white;
 	width: 24rem;
 	height: 41rem;
@@ -190,7 +191,7 @@
 	padding-bottom: 25px;
 	padding-left: 20px;
 	padding-right: 20px;
-	border: 4px solid black;
+	border: 1px solid black;
 	box-shadow: 0 6px 10px rgba(207, 212, 222, 1);
 	border-radius: 10px;
 	text-align: center;
@@ -208,7 +209,7 @@
 	object-fit: cover;
 	width: 12rem;
 	height: 12rem;
-	border: 4px solid black;
+	border: 1px solid black;
 	border-radius: 999px;
 	display: flex;
 	justify-content: center;
