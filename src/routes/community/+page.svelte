@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="src/routes/myprojects/styles.css">
+
 <div class="container py-4">
 	<div class="d-flex my-4">
 		<div class="p-2 w-100">
@@ -53,6 +55,9 @@
 								<p class="card-text">
 									When you can record or upload your own videos to create a new dataset
 								</p>
+								<button class="project-info-button" style="height: 30px" on:click={()=>window.location.href='/project/acquisition'}>
+									Go to Project
+								  </button>
 							</div>
 						</div>
 					</div>
@@ -96,3 +101,5 @@
 		</div>
 	</div>
 </div>
+
+

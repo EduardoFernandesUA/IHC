@@ -1,4 +1,48 @@
 <link rel="stylesheet" href="src/routes/myprojects/styles.css">
+
+<style>
+  .card {
+  width: calc(33.33% - 1rem);
+  margin: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.row {
+  height: 100%;
+  margin: 0;
+}
+
+.col-3 {
+  width: 33.33%;
+  padding: 0;
+  margin: 0;
+}
+
+.col-3 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.col-9 {
+  width: 66.66%;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+</style>
+
+
+
 <script>
 	import { comment } from "svelte/internal";
 
@@ -7,7 +51,7 @@
     {
       id: generateRandomId(),
       name: 'Project 1 - Hand Gestures',
-      description: 'Project that aims to detect hand gestures and classify them into different categories: thumbs up, thumbs down and peace. It can also extract features using the MediaPipe library.',
+      description: 'Project that aims to detect hand gestures and classify them into different categories: thumbs up, thumbs down and peace. It can also extract features using MediaPipe.',
       image: 'src/routes/images/gradient.jpeg',
       link: '/project/acquisition',
       classes: ['Thumbsup', 'Thumbsdown'],
@@ -48,32 +92,111 @@
 
 
   function create_project() {
-    let projectName = document.querySelector("#name").value;
-    let projectDescription = document.querySelector("#description").value;
+  let projectName = document.querySelector("#name").value;
+  let projectDescription = document.querySelector("#description").value;
 
-    projects.push({
-      id: generateRandomId(),
-      name: projectName,
-      description: projectDescription,
-      image: 'src/routes/images/gradient4.jpeg',
-      link: '/project/acquisition',
-      technologies: ['Svelte', 'JavaScript', 'HTML', 'CSS'],
-      role: 'Facial Queues',
-      created: '3 months'
-    });
+  const newProject = {
+    id: generateRandomId(),
+    name: projectName,
+    description: projectDescription,
+    image: 'src/routes/images/gradient4.jpeg',
+    link: '/project/acquisition',
+    technologies: ['Svelte', 'JavaScript', 'HTML', 'CSS'],
+    role: 'Facial Queues',
+    created: '3 months'
+  };
 
-    // Close the modal
-    const modal = document.querySelector("#newProject");
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    bootstrapModal.hide();
+  projects.push(newProject);
 
-    console.log(projects);
+  // Close the modal
+  const modal = document.querySelector("#newProject");
+  const bootstrapModal = bootstrap.Modal.getInstance(modal);
+  bootstrapModal.hide();
 
-    load_content();
+  console.log(projects);
+
+  appendProjectCard(newProject);
+
+  alert("Project created successfully! You are being redirected to the project page.");
+  goToProjectLink(newProject.link + '?id=' + newProject.id);
+
+  // Adjust project cards layout
+  adjustProjectCardsLayout();
+}
+
+  function appendProjectCard(project) {
+    const projectList = document.querySelector("#project_list");
+
+    const projectCard = document.createElement("div");
+    projectCard.classList.add("card", "h-100", "col-3");
+    projectCard.style.cursor = "pointer";
+
+    projectCard.addEventListener("click", () => goToProject(project.link, project.id));
+
+    const cardBody = document.createElement("div");
+    cardBody.classList.add("card-body", "p-0", "m-0");
+    // add margin left
+    cardBody.style.marginLeft = "0.5rem";
+
+    const row = document.createElement("div");
+    row.classList.add("row", "mx-0", "h-100");
+
+    const imageColumn = document.createElement("div");
+    imageColumn.classList.add("col-4", "m-0", "p-0", "h-100");
+
+
+    const image = document.createElement("img");
+    image.src = project.image;
+    image.alt = project.name;
+    image.style.width = "100%";
+    image.style.height = "auto"; // Change height to "auto" to maintain aspect ratio
+
+
+    const contentColumn = document.createElement("div");
+    contentColumn.classList.add("col-8", "p-3", "d-flex", "flex-column", "justify-content-between"); // Added flexbox classes
+
+    const projectNameElement = document.createElement("h5");
+    projectNameElement.textContent = project.name;
+
+    const projectDescriptionElement = document.createElement("p");
+    projectDescriptionElement.textContent = project.description;
+
+    const projectButton = document.createElement("button");
+    projectButton.classList.add("project-info-button", "mt-auto"); // Added margin-top:auto to push the button to the bottom
+    projectButton.style.height = "30px";
+    projectButton.textContent = "Go to Project";
+    projectButton.addEventListener("click", () => goToProject(project.link, project.id));
+
+    contentColumn.appendChild(projectNameElement);
+    contentColumn.appendChild(projectDescriptionElement);
+    contentColumn.appendChild(projectButton);
+
+    imageColumn.appendChild(image);
+
+    row.appendChild(imageColumn);
+    row.appendChild(contentColumn);
+
+    cardBody.appendChild(row);
+
+    projectCard.appendChild(cardBody);
+
+    projectList.appendChild(projectCard);
+
+    // Adjust project cards layout
+    adjustProjectCardsLayout();
   }
 
-  function goToProjectLink(link) {
+  function adjustProjectCardsLayout() {
+    const projectCards = document.querySelectorAll(".card");
+    const maxWidth = Math.max(...Array.from(projectCards).map(card => card.offsetWidth)); // Find the maximum width among project cards
 
+    projectCards.forEach(card => {
+      card.style.width = `${maxWidth}px`; // Set the width of each card to the maximum width
+    });
+  }
+
+
+  function goToProjectLink(link) {
     console.log(link);
     window.open(link, '_blank');
   }
@@ -86,36 +209,13 @@
   function load_content() {
     let project_list = document.querySelector("#project_list");
     project_list.innerHTML = '';
-    let projectIds = [];
-    
+
+    project_list.classList.add("d-flex", "flex-wrap", "align-items-start");
 
     projects.forEach((project) => {
-      const projectId = generateRandomId(); 
-      console.log(projectId);
-      const projectCard = `
-        <div class="project-card custom-project-card" onclick="window.open('/project/acquisition?id=${project.id}', '_blank')">
-          <img src="${project.image}" alt="${project.name}" />
-          <div class="project-card-content">
-            <h2>${project.name}</h2>
-            <p>${project.description}</p>
-            <div class="project-info">
-              <button class="project-info-button custom-project-info-button" onclick="window.open('/project/acquisition?id=${project.id}', '_blank')">
-                Go to Project
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      project_list.innerHTML += projectCard;
-      projectIds.push(projectId);
+      appendProjectCard(project);
     });
-
-    alert("Project created successfully! You are being redirected to the project page.");
-    goToProjectLink('/project/acquisition?id=' + projectIds[projectIds.length - 1]);
   }
-
-
 
 
 
@@ -242,24 +342,35 @@
 
   
 
-<div class="projects-container" id="project_list">
-{#each projects as project, index}
-<div class="project-card" on:click={() => goToProject(project.link, project.id)}>
-  <img src={project.image} alt={project.name} />
-  <div class="project-card-content">
-    <h2>{project.name}</h2>
-    <p>{project.description}</p>
-    <div class="project-info">
-      <button class="project-info-button" style= "height: 30px" on:click={() => goToProject(project.link, project.id)}>
-        Go to Project
-      </button>
-      {#if projectInfo}
-        <div class="project-info-popover">
-          <p>{projectInfo}</p>
+    <div class="projects-container" id="project_list">
+      {#each projects as project, index}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <div class="card h-100" style="cursor:pointer;" on:click={() => goToProject(project.link, project.id)}>
+          <div class="card-body p-0 m-0">
+            <div class="row mx-0 h-100">
+              <div class="col-3 m-0 p-0 h-100">
+                <img src={project.image} alt={project.name} style="width:100%;height:100%;"/>
+              </div>
+              <div class="col-9 p-3">
+                <h5>{project.name}</h5>
+                <p>{project.description}</p>
+                <button class="project-info-button" style="height: 30px" on:click={() => goToProject(project.link, project.id)}>
+                  Go to Project
+                </button>
+                {#if projectInfo}
+                  <div class="project-info-popover">
+                    <p>{projectInfo}</p>
+                  </div>
+                {/if}
+              </div>
+            </div>
+          </div>
         </div>
-      {/if}
+      {/each}
+
+        
     </div>
-  </div>
-</div>
-{/each}
-</div>
+
+
+    
+    
