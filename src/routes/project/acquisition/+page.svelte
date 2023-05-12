@@ -3,14 +3,7 @@
 
   $: height = (width*(3/4)) + 'px';
 
-  import { onMount } from 'svelte';
-
-  onMount(() => {
-
-    loadRecords();
-
-  });
-
+  
   let records = [
   ];
 
@@ -24,7 +17,14 @@
     delete record.editingName;
     record.name = document.getElementById(`name-input-${id}`).value;
   }
+  import { onMount } from 'svelte';
 
+  onMount(() => {
+
+    // localStorage.clear();
+    loadRecords();
+
+  });
     
   let stream;
   let recorder;
@@ -399,6 +399,8 @@
       // Save them in local storage
       localStorage.setItem('records', JSON.stringify(records));
     }
+
+    localStorage.setItem('records', JSON.stringify(records));
   }
 
 
@@ -503,8 +505,8 @@
       {#each records as record (record.id)}
         <tr id="record-{record.id}">
           <th scope="row">{record.id}</th>
-          <td id="recordName">{record.name}</td>
-          <td id="recordClass">{record.class}</td>
+          <td id="recordName-{record.id}">{record.name}</td>
+          <td id="recordClass-{record.id}">{record.class}</td>
           <td>{record.duration}</td>
           <td>
             <button class="btn btn-danger" on:click={() => deleteRecord(record.id)}>
@@ -518,8 +520,8 @@
       {/each}
     </tbody>
   </table>
-  
 </div>
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"  />
 <style>
