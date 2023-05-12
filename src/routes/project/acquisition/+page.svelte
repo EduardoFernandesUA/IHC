@@ -43,40 +43,65 @@
     console.log('close modal');
   }
 
+  let isCameraOn = false; // flag to keep track of camera state
+  
+
   async function openCamera() {
-    isPlaying = true;
     try {
-      // cam
-      stream = await navigator.mediaDevices.getUserMedia({ video: true }); // only video no audio
-      const videoElement = document.querySelector('video'); // only vid
+      if (isCameraOn) {
+        // Camera is already on, so turn it off
+        stopCamera();
+        return;
+      }
 
-      videoElement.srcObject = stream; 
- 
-      recorder = new MediaRecorder(stream); 
+      // Request camera access
+      stream = await navigator.mediaDevices.getUserMedia({ video: true }); // only video, no audio
+      const videoElement = document.querySelector('video');
 
-      recorder.addEventListener('dataavailable', event => { 
+      videoElement.srcObject = stream;
+
+      recorder = new MediaRecorder(stream);
+
+      recorder.addEventListener('dataavailable', event => {
         chunks.push(event.data);
-        console.log(chunks)
+        console.log(chunks);
       });
 
-      
+      const closeCamera = document.getElementById('openCamera');
+      closeCamera.innerHTML = 'Close Camera';
+
+      isCameraOn = true; // Set the camera state to on
+
     } catch (error) {
       console.error('Error opening camera:', error);
     }
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      stream = null;
+    }
+    const videoElement = document.querySelector('video');
+    if (videoElement) {
+      videoElement.srcObject = null;
+    }
     const bgBlackElement = document.querySelector('.bg-black');
     if (bgBlackElement) {
-      bgBlackElement.style.display = 'none';
+      bgBlackElement.style.display = 'block';
     }
-    
-  } 
+
+    const closeCamera = document.getElementById('openCamera');
+    closeCamera.innerHTML = 'Open Camera';
+
+    isCameraOn = false; // Set the camera state to off
+  }
 
 
 
   async function startRecording() {
     isRecording = true;
-    if (!isPlaying) { // if cam not open, open it
-      await openCamera();
-    }
+    
 
     const startRecord = document.getElementById('record');
     startRecord.style.display = 'none';
@@ -165,7 +190,7 @@
     a.style = 'display: none';
     a.href = url;
     a.download = filename + '.mp4';
-    a.click();
+    // a.click();
     window.URL.revokeObjectURL(url);
     chunks = []; 
     
@@ -177,6 +202,13 @@
     };
 
     records.push(newRecord);
+
+    localStorage.setItem('records', JSON.stringify(records));
+
+    // close modal
+    const modal = document.getElementById('previewVideoModal');
+    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+    bootstrapModal.hide();
 
     // list the records on the table
     const tableBody = document.querySelector('tbody');
@@ -253,6 +285,7 @@
 
 <div class="row">
 	<div class="col-3"  style="margin-right: 100px;">
+  
 		<form>
 			<fieldset>
         <h5 class="my-4">Options:</h5>
@@ -277,10 +310,10 @@
 					<input type="number" aria-label="First name" class="form-control" value="1"/>
 				</div>
         {#if !isPlaying}
-        <button id="record" type="submit" class="btn btn-dark w-100 text-center mt-2" on:click={openCamera}>Open Camera</button>
+        <button id="openCamera" type="submit" class="btn btn-dark w-100 text-center mt-2" on:click={openCamera}>Open Camera</button>
         {/if} 
 				<button id="record" type="submit" class="btn btn-dark w-100 text-center mt-2" on:click={startRecording}>Record</button>
-        
+       
       
 
         <br>
@@ -311,7 +344,7 @@
           <button type="button" class="btn-close" on:click={() => closeModal()} aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <video id="previewVideo" controls class="w-100">
+          <video id="previewVideo" controls class="w-100" autoplay>
             <track kind="captions" />
           </video>
         </div>
@@ -370,6 +403,7 @@
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"  />
 <style>
+   
   .icon-container {
     display: flex;
     justify-content: center;
