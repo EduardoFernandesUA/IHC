@@ -3,8 +3,15 @@
 
   $: height = (width*(3/4)) + 'px';
 
+  import { onMount } from 'svelte';
+
+  onMount(() => {
+
+    loadRecords();
+
+  });
+
   let records = [
-    { id: 1, name: 'video_#1', class: 'ThumbsUp', duration: 3 },
   ];
 
   function editName(id) {
@@ -26,25 +33,36 @@
   let isRecording = false;
   let countDown = 0;
   let duration = 0;
+  
 
 
   function closeModal() {
     const modal = document.getElementById('previewVideoModal');
     const bootstrapModal = bootstrap.Modal.getInstance(modal);
     bootstrapModal.hide();
+
+    // force close modal
+    bootstrapModal.hide();
+
     document.body.classList.remove('modal-open');
     document.body.style.overflow = ''; // Restore scrolling
 
-    const modalBackdrop = document.querySelector('.modal-backdrop');
-    if (modalBackdrop) {
-      modalBackdrop.parentNode.removeChild(modalBackdrop);
-    }
-
+ 
     console.log('close modal');
   }
 
+
+
   let isCameraOn = false; // flag to keep track of camera state
   
+  function loadRecords() {
+    const storedRecords = localStorage.getItem('records');
+
+    if (storedRecords) {
+      records = JSON.parse(storedRecords);
+    }
+  }
+
 
   async function openCamera() {
     try {
@@ -178,26 +196,28 @@
   function downloadVideo() {
     const blob = new Blob(chunks, { type: 'video/mp4' });
     const url = URL.createObjectURL(blob);
-    
-    // get users input for video name
+
     const filename = prompt('Enter a name for the video file:', 'recorded-video');
-    // if prompt is cancelled, skip the file save
     if (!filename) {
       return;
     }
+
     const a = document.createElement('a');
     document.body.appendChild(a);
     a.style = 'display: none';
     a.href = url;
     a.download = filename + '.mp4';
-    // a.click();
+    //a.click();
     window.URL.revokeObjectURL(url);
-    chunks = []; 
-    
+
+    chunks = [];
+
+    let newRecordClass = document.getElementById('inputGroupSelect02').value;
+
     const newRecord = {
       id: records.length + 1,
       name: filename,
-      class: 'ThumbsUp', 
+      class: newRecordClass,
       duration: duration
     };
 
@@ -205,79 +225,185 @@
 
     localStorage.setItem('records', JSON.stringify(records));
 
-    // close modal
-    const modal = document.getElementById('previewVideoModal');
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    bootstrapModal.hide();
+    closeModal();
+    renderRecords();
+  }
 
-    // list the records on the table
+
+  function renderRecords() {
     const tableBody = document.querySelector('tbody');
-    const tableRow = document.createElement('tr');
+    tableBody.innerHTML = ''; // Clear the existing rows
 
-    const idCell = document.createElement('th');
-    idCell.setAttribute('scope', 'row');
-    idCell.innerHTML = newRecord.id;
-    tableRow.appendChild(idCell);
+    for (const record of records) {
+      const tableRow = document.createElement('tr');
+      tableRow.setAttribute('id', `record-${record.id}`);
 
-    // add mame to recorded video
-    const nameCell = document.createElement('td');
-    const nameInput = document.createElement('input');
-    nameInput.setAttribute('type', 'text');
-    nameInput.setAttribute('id', `name-input-${newRecord.id}`);
-    nameInput.setAttribute('value', newRecord.name);
-    nameInput.addEventListener('blur', () => saveName(newRecord.id));
-    nameCell.appendChild(nameInput);
-    tableRow.appendChild(nameCell);
+      const idCell = document.createElement('th');
+      idCell.setAttribute('scope', 'row');
+      idCell.textContent = record.id;
+      tableRow.appendChild(idCell);
 
-    // add class to recorded video
-    const classCell = document.createElement('td');
-    const classSelect = document.createElement('select');
-    classSelect.setAttribute('value', newRecord.class);
-    classSelect.addEventListener('change', () => saveName(newRecord.id));
-    const thumbsUpOption = document.createElement('option');
-    thumbsUpOption.setAttribute('value', 'ThumbsUp');
-    thumbsUpOption.innerHTML = 'ThumbsUp';
-    classSelect.appendChild(thumbsUpOption);
-    const thumbsDownOption = document.createElement('option');
-    thumbsDownOption.setAttribute('value', 'ThumbsDown');
-    thumbsDownOption.innerHTML = 'ThumbsDown';
-    classSelect.appendChild(thumbsDownOption);
-    const peaceSignOption = document.createElement('option');
-    peaceSignOption.setAttribute('value', 'PeaceSign');
-    peaceSignOption.innerHTML = 'PeaceSign';
-    classSelect.appendChild(peaceSignOption);
-    classCell.appendChild(classSelect);
-    tableRow.appendChild(classCell);
+      const nameCell = document.createElement('td');
+      nameCell.id = `recordName-${record.id}`;
+      const nameText = document.createElement('span');
+      nameText.textContent = record.name;
+      nameCell.appendChild(nameText);
+      tableRow.appendChild(nameCell);
 
-    // add duration to recorded video
-    const durationCell = document.createElement('td');
-    durationCell.innerHTML = newRecord.duration;
-    tableRow.appendChild(durationCell);
-    tableBody.appendChild(tableRow);
+      const classCell = document.createElement('td');
+      classCell.id = `recordClass-${record.id}`;
 
-    // add delete button to recorded video
-    const deleteCell = document.createElement('td');
-    const deleteButton = document.createElement('button');
-    deleteButton.setAttribute('class', 'btn btn-danger');
-    deleteButton.innerHTML = '<i class="fas fa-trash"></i>'; // Replace the button content with the trash can icon
-    deleteButton.addEventListener('click', () => deleteRecord(newRecord.id));
-    deleteCell.appendChild(deleteButton);
-    tableRow.appendChild(deleteCell);
+      const classText = document.createElement('span');
+      classText.textContent = record.class;
+      classCell.appendChild(classText);
+      tableRow.appendChild(classCell);
 
+      // const thumbsUpOption = document.createElement('option');
+      // thumbsUpOption.value = 'ThumbsUp';
+      // thumbsUpOption.textContent = 'ThumbsUp';
+      // classSelect.appendChild(thumbsUpOption);
+
+      // const thumbsDownOption = document.createElement('option');
+      // thumbsDownOption.value = 'ThumbsDown';
+      // thumbsDownOption.textContent = 'ThumbsDown';
+      // classSelect.appendChild(thumbsDownOption);
+
+      // const peaceSignOption = document.createElement('option');
+      // peaceSignOption.value = 'PeaceSign';
+      // peaceSignOption.textContent = 'Peace';
+      // classSelect.appendChild(peaceSignOption);
+
+      // classCell.appendChild(classSelect);
+      tableRow.appendChild(classCell);
+
+      const durationCell = document.createElement('td');
+      durationCell.textContent = record.duration;
+      tableRow.appendChild(durationCell);
+
+      const actionsCell = document.createElement('td');
+      const deleteButton = document.createElement('button');
+      deleteButton.setAttribute('class', 'btn btn-danger');
+      deleteButton.addEventListener('click', () => deleteRecord(record.id));
+      const deleteIcon = document.createElement('i');
+      deleteIcon.setAttribute('class', 'fas fa-trash');
+      deleteButton.style.marginRight = '5px';
+      deleteButton.appendChild(deleteIcon);
+      deleteButton.setAttribute('title', 'Delete Video');
+
+
+      const editButton = document.createElement('button');
+      editButton.setAttribute('class', 'btn btn-dark');
+      editButton.addEventListener('click', () => editRecord(record.id));
+      const editIcon = document.createElement('i');
+      editIcon.setAttribute('class', 'fas fa-edit');
+      editButton.style.marginRight = '5px';
+      editButton.appendChild(editIcon);
+      editButton.setAttribute('title', 'Edit Video Elements');
+
+      const featureButton = document.createElement('button');
+      featureButton.setAttribute('class', 'btn btn-dark');
+      featureButton.addEventListener('click', () => featureRecord(record.id));
+      const featureIcon = document.createElement('i');
+      featureIcon.setAttribute('class', 'fas fa-star');
+      featureButton.style.marginRight = '5px';
+      featureButton.appendChild(featureIcon);
+      featureButton.setAttribute('title', 'Extract Features');
+
+
+      actionsCell.appendChild(deleteButton);
+      actionsCell.appendChild(editButton);
+      actionsCell.appendChild(featureButton);
+      tableRow.appendChild(actionsCell);
+
+      tableBody.appendChild(tableRow);
+
+    }
+
+    localStorage.setItem('records', JSON.stringify(records));
+
+    if (localStorage.getItem('records') === JSON.stringify(records)) {
+      console.log('Records saved successfully in local storage.');
+    } else {
+      console.log('Failed to save records in local storage.');
+    }
   }
 
   function deleteRecord(id) {
-    const record = records.find(r => r.id === id);
-    const index = records.indexOf(record);
-    records.splice(index, 1);
+    const index = records.findIndex(record => record.id === id);
 
-    const tableBody = document.querySelector('tbody');
-    const tableRow = document.getElementById(`record-${id}`);
-    
-    if (tableBody && tableRow) {
-      tableBody.removeChild(tableRow);
+    if (index !== -1) {
+      records.splice(index, 1);
+      localStorage.setItem('records', JSON.stringify(records));
+      renderRecords(); // Update the table display
     }
   }
+
+  function editRecord(id) {
+    const record = records.find(r => r.id === id);
+
+    var nameContainer = document.getElementById(`recordName-${id}`);
+
+    if (!nameContainer.querySelector('input')) {
+      // Convert name cell to input element
+      const nameCell = document.getElementById(`recordName-${id}`);
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.value = record.name;
+      nameInput.id = `name-input-${id}`; // Add ID to name input
+      nameCell.innerHTML = '';
+      nameCell.appendChild(nameInput);
+
+      // Convert class cell to select element
+      const classCell = document.getElementById(`recordClass-${id}`);
+      const classSelect = document.createElement('select');
+      classSelect.id = `recordClassSelect-${id}`;
+
+      const thumbsUpOption = document.createElement('option');
+      thumbsUpOption.value = 'ThumbsUp';
+      thumbsUpOption.textContent = 'ThumbsUp';
+      classSelect.appendChild(thumbsUpOption);
+
+      const thumbsDownOption = document.createElement('option');
+      thumbsDownOption.value = 'ThumbsDown';
+      thumbsDownOption.textContent = 'ThumbsDown';
+      classSelect.appendChild(thumbsDownOption);
+
+      const peaceSignOption = document.createElement('option');
+      peaceSignOption.value = 'PeaceSign';
+      peaceSignOption.textContent = 'Peace';
+      classSelect.appendChild(peaceSignOption);
+
+      classSelect.value = record.class;
+      classCell.innerHTML = '';
+      classCell.appendChild(classSelect);
+    } else {
+      // Convert name input to text
+      const nameInput = document.getElementById(`name-input-${id}`);
+      record.name = nameInput.value;
+      const nameCell = document.getElementById(`recordName-${id}`);
+      nameCell.innerHTML = '';
+      const nameText = document.createElement('span');
+      nameText.textContent = record.name;
+      nameCell.appendChild(nameText);
+
+      // Convert class select to text
+      const classSelect = document.getElementById(`recordClassSelect-${id}`);
+      record.class = classSelect.value;
+      const classCell = document.getElementById(`recordClass-${id}`);
+
+      classCell.innerHTML = '';
+      const classText = document.createElement('span');
+      classText.textContent = record.class;
+      classCell.appendChild(classText);
+
+      // Save them in local storage
+      localStorage.setItem('records', JSON.stringify(records));
+    }
+  }
+
+
+
+
 
 
 </script>
@@ -299,11 +425,11 @@
 				</div>
 				<div class="input-group">
           <span class="input-group-text w-75">Count Down</span>
-          <input type="number" aria-label="First name" class="form-control" value="3" id="count-down-input"/>
+          <input type="number" aria-label="First name" class="form-control" value="1" id="count-down-input"/>
         </div>
         <div class="input-group">
           <span class="input-group-text w-75">Duration</span>
-          <input type="number" aria-label="First name" class="form-control" value="3" id="duration-input"/>
+          <input type="number" aria-label="First name" class="form-control" value="1" id="duration-input"/>
         </div>
 				<div class="input-group">
 					<span class="input-group-text w-75">Repetitions</span>
@@ -377,28 +503,22 @@
       {#each records as record (record.id)}
         <tr id="record-{record.id}">
           <th scope="row">{record.id}</th>
-          <td>
-            <input type="text" id="name-input-{record.id}" bind:value={record.name} on:blur={() => saveName(record.id)} />
-          </td>
-          <td>
-            <select bind:value={record.class} style="text-align:center">
-              <option value="ThumbsUp">ThumbsUp</option>
-              <option value="ThumbsDown">ThumbsDown</option>
-              <option value="PeaceSign">Peace</option>
-            </select>
-          </td>
+          <td id="recordName">{record.name}</td>
+          <td id="recordClass">{record.class}</td>
           <td>{record.duration}</td>
           <td>
             <button class="btn btn-danger" on:click={() => deleteRecord(record.id)}>
               <i class="fas fa-trash"></i>
             </button>
+            <button class="btn btn-dark" on:click={() => editRecord(record.id)}>
+              <i class="fas fa-edit"></i>
+            </button>
           </td>
         </tr>
       {/each}
-
     </tbody>
-    
   </table>
+  
 </div>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"  />
