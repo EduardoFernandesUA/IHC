@@ -302,23 +302,7 @@
                     </div>
                    
                      <div class="row" style="margin-top: 10px;">
-                        <div class="col">
-                          <div class="form-group" id="Category" value="Gestures">
-                            <label for="option">Category</label>
-                            <div class="form-check">
-                              <input class="form-check-input" type="radio" name="category_option" id="gestures" value="video">
-                              <label class="form-check-label" for="gestures">
-                                Video
-                              </label>
-                            </div>
-                            <div class="form-check">
-                              <input class="form-check-input" type="radio" name="category_option" id="audio" value="audio">
-                              <label class="form-check-label" for="audio">
-                                Audio
-                              </label>
-                            </div>
-                          </div>
-                        </div>
+                        
                         <div class="col">
                           <div class="form-group" id="Privacy" value="Public">
                             <label for="option">Privacy</label>
