@@ -287,6 +287,7 @@
       const deleteIcon = document.createElement('i');
       deleteIcon.setAttribute('class', 'fas fa-trash');
       deleteButton.style.marginRight = '5px';
+      deleteButton.style.marginLeft = '50px';
       deleteButton.appendChild(deleteIcon);
       deleteButton.setAttribute('title', 'Delete Video');
 
@@ -309,12 +310,21 @@
       featureButton.appendChild(featureIcon);
       featureButton.setAttribute('title', 'Extract Features');
 
+      const previewCell = document.createElement('td');
+      const previewButton = document.createElement('button');
+      previewButton.setAttribute('class', 'btn btn-dark');
+      previewButton.addEventListener('click', () => previewRecord(record.id));
+      const previewIcon = document.createElement('i');
+      previewIcon.setAttribute('class', 'fas fa-eye');
+      previewButton.style.marginRight = '5px';
+      previewButton.appendChild(previewIcon);
+      previewButton.setAttribute('title', 'Preview Video');
 
       actionsCell.appendChild(deleteButton);
       actionsCell.appendChild(editButton);
+      actionsCell.appendChild(previewButton);
       actionsCell.appendChild(featureButton);
       tableRow.appendChild(actionsCell);
-
       tableBody.appendChild(tableRow);
 
     }
@@ -326,6 +336,30 @@
     } else {
       console.log('Failed to save records in local storage.');
     }
+  }
+
+  function previewRecord(id) {
+    const record = records.find(r => r.id === id);
+    const recordChunks = record.chunks;
+    const blob = new Blob(recordChunks, { type: 'video/webm' });
+    const videoURL = URL.createObjectURL(blob);
+
+    const modalVideo = document.getElementById('previewVideo');
+    modalVideo.src = videoURL;
+
+    const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
+    modal.show();
+
+    const downloadButton = document.getElementById('download-button');
+    downloadButton.removeEventListener('click', downloadVideo);
+    downloadButton.addEventListener('click', downloadVideo);
+
+    const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
+    closeModalButton.removeEventListener('click', closeModal);
+    closeModalButton.addEventListener('click', () => closeModal(modal));
+
+    const startRecord = document.getElementById('record');
+    startRecord.style.display = 'block';
   }
 
   function deleteRecord(id) {
@@ -515,6 +549,12 @@
             <button class="btn btn-dark" on:click={() => editRecord(record.id)}>
               <i class="fas fa-edit"></i>
             </button>
+            <button class="btn btn-dark" on:click={() => previewRecord(record.id)}>
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-dark" on:click={() => extractFeatures(record.id)}>
+              <i class="fas fa-star"></i>
+            </button>
           </td>
         </tr>
       {/each}
@@ -523,7 +563,8 @@
 </div>
 
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"  />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
 <style>
    
   .icon-container {
