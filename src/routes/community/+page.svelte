@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="src/routes/myprojects/styles.css">
+
 <div class="container py-4">
 	<div class="d-flex my-4">
 		<div class="p-2 w-100">
@@ -32,6 +34,9 @@
 								<p class="card-text">
 									Here you can find and see all of the data sets created until today
 								</p>
+								<button class="project-info-button" style="height: 30px" on:click={()=>window.location.href='/project/acquisition'}>
+									Go to Project
+								  </button>
 							</div>
 						</div>
 					</div>
@@ -53,6 +58,9 @@
 								<p class="card-text">
 									When you can record or upload your own videos to create a new dataset
 								</p>
+								<button class="project-info-button" style="height: 30px" on:click={()=>window.location.href='/project/acquisition'}>
+									Go to Project
+								  </button>
 							</div>
 						</div>
 					</div>
@@ -70,6 +78,9 @@
 								<p class="card-text">
 									Here you can find and see all of the data sets created until today
 								</p>
+								<button class="project-info-button" style="height: 30px" on:click={()=>window.location.href='/project/acquisition'}>
+									Go to Project
+								  </button>
 							</div>
 						</div>
 					</div>
@@ -88,6 +99,9 @@
 									At the video acquisition the user can label and annotate their own videos at his
 									free will
 								</p>
+								<button class="project-info-button" style="height: 30px" on:click={()=>window.location.href='/project/acquisition'}>
+									Go to Project
+								  </button>
 							</div>
 						</div>
 					</div>
@@ -96,3 +110,5 @@
 		</div>
 	</div>
 </div>
+
+

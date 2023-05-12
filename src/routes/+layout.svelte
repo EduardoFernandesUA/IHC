@@ -45,10 +45,10 @@
 				</ul>
 				<ul class="navbar-nav">
 					<li class="nav-link">
-						<a class="nav-link {path == '/browse' ? 'active' : ''}" href="/browse">Profile</a>
+						<a class="nav-link {path == '/browse' ? 'active' : ''}" href="/profile">Profile</a>
 					</li>
 					<li class="nav-link">
-						<a class="nav-link {path == '/browse' ? 'active' : ''}" href="/browse">Login/Register</a
+						<a class="nav-link {path == '/browse' ? 'active' : ''}" href="/login">Login/Register</a
 						>
 					</li>
 				</ul>

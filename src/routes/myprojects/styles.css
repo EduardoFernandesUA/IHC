@@ -112,4 +112,15 @@
     cursor: pointer;
     position: relative;
   }
+
+  .card {
+    margin-bottom: 10px;
+    margin-right: 2px; /* Add space between cards */
+  }
+  
+  
+  .project-card {
+    margin-bottom: 10px;
+    margin-right: 2px; 
+  }
   
