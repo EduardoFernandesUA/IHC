@@ -1,5 +1,21 @@
 <link rel="stylesheet" href="src/routes/myprojects/styles.css">
 
+<script lang="ts">
+    let credentials = {usr: "admin", password: "1234"}
+
+    function submitSignin(){
+        let usr = document.querySelector("#formSigninUsername").value
+        let password = document.querySelector("#formSigninPassword").value
+        const users = credentials
+        console.log(credentials.length)
+            console.log("EW")
+            if(users['usr'] == usr && users['password'] == password){
+                window.location.href='/'
+            }
+        
+
+    }
+</script>
 
 <section class="text-center text-lg-start">
 	<div class="container my-2">
@@ -67,7 +83,7 @@
 
                 <!-- Submit button -->
                 <div id="formSignin" onsubmit="submitSignin() " >
-                <button type="submit" class="btn btn-primary btn-block mb-4" onclick="window.location.href='/'">
+                <button type="submit" class="btn btn-primary btn-block mb-4" on:click={submitSignin}>
                     Sign in
                     </button>
                 </div>
@@ -133,7 +149,7 @@
                         </div>
 
                         <!-- Submit button -->
-                        <button id="formSignup" class="btn btn-primary btn-block mb-3">Sign in</button>
+                        <button id="formSignup" class="btn btn-primary btn-block mb-3">Register</button>
                 </form>
             
             
@@ -169,8 +185,4 @@
 
 
 
-</style>
-
-<script>
-
-</script>
+</style>   
