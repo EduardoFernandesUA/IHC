@@ -1,7 +1,7 @@
 <script lang='ts'>
   let width: number, height: string;
 
-  $: height = (width*(3/4)) + 'px';
+  
 
   
   let records = [
@@ -141,7 +141,7 @@
 
           try {
             recordingText.innerHTML = "Recording...";
-            recorder.start();
+            recorder.start(100);
             console.log('Recording video ...');
 
             setTimeout(() => {
@@ -176,6 +176,7 @@
       
     const blob = new Blob(chunks, { type: 'video/webm' });
     const videoURL = URL.createObjectURL(blob);
+    console.log(videoURL)
 
     modalVideo.src = videoURL;
 
@@ -184,8 +185,8 @@
 
     const downloadButton = document.getElementById('download-button');
     downloadButton.removeEventListener('click', downloadVideo);
-    downloadButton.addEventListener('click', downloadVideo);
-
+    downloadButton.addEventListener('click', ()=>downloadVideo(videoURL));
+    
     const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
     closeModalButton.removeEventListener('click', () => closeModal(modal));
 
@@ -193,10 +194,7 @@
     startRecord.style.display = 'block';
   }
 
-  function downloadVideo() {
-    const blob = new Blob(chunks, { type: 'video/mp4' });
-    const url = URL.createObjectURL(blob);
-
+  function downloadVideo(url) {
     const filename = prompt('Enter a name for the video file:', 'recorded-video');
     if (!filename) {
       return;
@@ -218,7 +216,8 @@
       id: records.length + 1,
       name: filename,
       class: newRecordClass,
-      duration: duration
+      duration: duration,
+      url: url
     };
 
     records.push(newRecord);
@@ -339,10 +338,13 @@
   }
 
   function previewRecord(id) {
-    const record = records.find(r => r.id === id);
-    const recordChunks = record.chunks;
-    const blob = new Blob(recordChunks, { type: 'video/webm' });
-    const videoURL = URL.createObjectURL(blob);
+    // const record = records.find(r => r.id === id);
+    // const recordChunks = record.chunks;
+    // const blob = new Blob(recordChunks, { type: 'video/webm' });
+    // const videoURL = URL.createObjectURL(blob);
+    let videoURL = JSON.parse(localStorage.getItem('records'))
+    console.log(videoURL)
+    videoURL = videoURL.find((e)=>e['id']==id)['url']
 
     const modalVideo = document.getElementById('previewVideo');
     modalVideo.src = videoURL;
@@ -439,7 +441,7 @@
 
 
 
-
+  $: height = (width*(3/4)) + 'px';
 
 
 </script>
