@@ -10,19 +10,30 @@
 	let stream;
 	let isPlaying: boolean = false;
 
-	let checkboxs = [];
+	let checkboxs: Object[] = [];
 	
 	onMount( async () => {
 		videoDiv.style.height = width * (3/4) + "px";
 
-		const response = await fetch('http://localhost:5000/api/feature');
-		const data = await response.json();
-		// data.forEach(element => {
-		// 	element
-			
-		// });
-		checkboxs = data;
+		load()
+		
 	})
+
+	async function load() {
+		const response = await fetch('http://localhost:5000/api/feature');
+		const data: string[] = await response.json();
+		const dataParsed: Array<Object> = data.map((elem,i)=>{
+			return {
+				"name": elem.split("_").join(" ").toUpperCase(),
+				"code": elem,
+				"points": [],
+				"edges": [],
+				"elem": false
+			}
+		})
+		checkboxs = dataParsed;
+	} 
+	
 
 	async function openCamera() {
 		try {
@@ -34,38 +45,51 @@
 
 		webVideo.srcObject = stream;
 		isPlaying = true;
+
+		// prepare canvas
 		let ctx = canva1.getContext('2d');
-		ctx?.fillRect(0,0,canva1.width,canva1.height)
-		let ctxPoints = canva2.getContext('2d');
-		ctxPoints?.fillRect(0,0,canva2.width,canva2.height)
+		let ctxPoints: CanvasRenderingContext2D = canva2.getContext('2d');
 		ctxPoints.fillStyle = "#FF0000";
 		let cw = canva2.width, ch = canva2.height;
-		let interval = setInterval( async ()=>{
+
+		var runnnig = false;
+		let intervel = setInterval( async ()=>{
+			if( runnnig ) return;
+			runnnig = true;
 			ctx?.drawImage(webVideo, 0, 0, cw, ch);
-			let blob = await new Promise(resolve => canva1.toBlob(resolve, 'image/png'));
-			let form = new FormData();
-			form.append('blob', blob);
-			let response = await fetch('http://localhost:5000/api/feature/mediapipe_hand', {
-				method: 'POST',
-				body: form
-			})
-			response = await response.json();
-			ctxPoints?.clearRect(0, 0, cw, ch);
-			if( !response.status ) return;
-			for(let j=0; j<response.points.length; j++) {
-				for(let point of response.points[j].edges) {
-					ctxPoints?.beginPath();
-					ctxPoints?.moveTo(response.points[j].vertices[point[0]].x*cw, response.points[j].vertices[point[0]].y*ch);
-					ctxPoints?.lineTo(response.points[j].vertices[point[1]].x*cw, response.points[j].vertices[point[1]].y*ch);
-					ctxPoints?.stroke();
-				}
-				for(let point of response.points[j].vertices) {
-					ctxPoints?.beginPath();
-					ctxPoints?.arc(point.x*cw, point.y*ch, 2, 0, 2 * Math.PI);
-					ctxPoints?.fill();
+			
+
+			for(let checkbox of checkboxs) {
+				if( !checkbox.elem ) continue;
+				let blob: Blob = await new Promise(resolve => canva1.toBlob(resolve, 'image/png'));
+				let form = new FormData();
+				form.append('blob', blob);
+				let response = await fetch('http://localhost:5000/api/feature/'+checkbox.code, {
+					method: 'POST',
+					body: form
+				})
+				ctxPoints.clearRect(0, 0, cw, ch);
+				response = await response.json();
+				console.log(response)
+				if( !response.status ) break;
+				for(let j=0; j<response.points.length; j++) {
+					for(let point of response.points[j].edges) {
+						ctxPoints?.beginPath();
+						ctxPoints?.moveTo(response.points[j].vertices[point[0]].x*cw, response.points[j].vertices[point[0]].y*ch);
+						ctxPoints?.lineTo(response.points[j].vertices[point[1]].x*cw, response.points[j].vertices[point[1]].y*ch);
+						ctxPoints?.stroke();
+					}
+					for(let point of response.points[j].vertices) {
+						ctxPoints.beginPath();
+						ctxPoints.arc(point.x*cw, point.y*ch, 2, 0, 2 * Math.PI);
+						ctxPoints.fill();
+					}
 				}
 			}
-		}, 1000/10)
+			runnnig = false;
+
+			
+		}, 1000/30);
 		
 	}
 </script>
@@ -79,13 +103,14 @@
 					<div class="input-group">
 						<div class="input-group-text">
 							<input
+								id={"check"+checkbox.name}
 								class="form-check-input mt-0"
 								type="checkbox"
-								value=""
+								bind:checked={checkbox.elem}
 								aria-label="Checkbox for following text input"
 							/>
 						</div>
-						<span class="input-group-text" style="flex-grow: 1;">{checkbox}</span>
+						<span class="input-group-text" style="flex-grow: 1;">{checkbox.name}</span>
 					</div>
 				{/each}
 				<!-- <div class="input-group">

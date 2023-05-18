@@ -54,39 +54,42 @@ def mediapipe_facedetection(videoPath, **user_options):
     results = [] # vertices and edges
 
     with mp_face_detection.FaceDetection(**options) as face_detection:
-        cap = cv2.VideoCapture(videoPath)
+        filestr = videoPath.read()
+        file_bytes = numpy.fromstring(filestr, numpy.uint8)
+        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret: break
+        # while cap.isOpened():
+        #     ret, frame = cap.read()
+        #     if not ret: break
 
-            result = face_detection.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            if not result.detections: continue
+        result = face_detection.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        if not result.detections: return {'points': {'vertices': []}}
 
-            vertices = []
-            edges = []
-            for face in result.detections:
-                i = len(vertices)
-                box = face.location_data.relative_bounding_box
-                vertices.append({'x': box.xmin, 'y': box.ymin})
-                vertices.append({'x': box.xmin+box.width, 'y': box.ymin})
-                vertices.append({'x': box.xmin, 'y': box.ymin+box.height})
-                vertices.append({'x': box.xmin+box.width, 'y': box.ymin+box.height})
-                edges += [[i,i+1],[i,i+2],[i+1,i+3],[i+2,i+3]]
-                vertices += [{'x':j.x, 'y':j.y} for j in face.location_data.relative_keypoints]
+        vertices = []
+        edges = []
+        for face in result.detections:
+            i = len(vertices)
+            box = face.location_data.relative_bounding_box
+            vertices.append({'x': box.xmin, 'y': box.ymin})
+            vertices.append({'x': box.xmin+box.width, 'y': box.ymin})
+            vertices.append({'x': box.xmin, 'y': box.ymin+box.height})
+            vertices.append({'x': box.xmin+box.width, 'y': box.ymin+box.height})
+            edges += [[i,i+1],[i,i+2],[i+1,i+3],[i+2,i+3]]
+            vertices += [{'x':j.x, 'y':j.y} for j in face.location_data.relative_keypoints]
 
-            # location_data = result.detections[0].location_data
-            # box_vertices = []
-            # print(location_data)
-            results.append({
-                'vertices': vertices,
-                'edges': edges
-            })
+        # location_data = result.detections[0].location_data
+        # box_vertices = []
+        # print(location_data)
+        results.append({
+            'vertices': vertices,
+            'edges': edges,
+        })
     
     resp = {
         'name': 'mediapipe_facedetection',
         'type': 'points',
-        'points': results
+        'points': results,
+        'status': 'found'
     }
 
     return resp
@@ -102,29 +105,28 @@ def mediapipe_facemesh(videoPath, **user_options):
     results = [] # vertices and edges
 
     with mp_facemesh.FaceMesh(**options) as face_mesh:
-        cap = cv2.VideoCapture(videoPath)
+        filestr = videoPath.read()
+        file_bytes = numpy.fromstring(filestr, numpy.uint8)
+        img = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
 
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret: break
+        result = face_mesh.process(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        if not result.multi_face_landmarks: return
 
-            result = face_mesh.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            if not result.multi_face_landmarks: continue
+        vertices = []
+        for face in result.multi_face_landmarks:
+            # print(len(list(face.landmark)))
+            vertices += [{'x': i.x, 'y': i.y, 'z': i.z} for i in face.landmark]
 
-            vertices = []
-            for face in result.multi_face_landmarks:
-                # print(len(list(face.landmark)))
-                vertices += [{'x': i.x, 'y': i.y, 'z': i.z} for i in face.landmark]
-
-            results.append({
-                'vertices': vertices,
-                'edges': []
-            })
+        results.append({
+            'vertices': vertices,
+            'edges': []
+        })
     
     resp = {
         'name': 'mediapipe_facemesh',
         'type': 'points',
-        'points': results
+        'points': results,
+        'status': 'found'
     }
 
     return resp
