@@ -87,13 +87,14 @@
     if (storedProjects) {
       let parsedProjects = JSON.parse(storedProjects);
       if (parsedProjects.length > 3) {
-        parsedProjects = parsedProjects.slice(0, 3);
-        localStorage.setItem('projects', JSON.stringify(parsedProjects));
+        hasNewProjects = true;
+      } else {
+        hasNewProjects = false;
       }
-      hasNewProjects = parsedProjects.length > 3;
     }
-    adjustProjectCardsLayout(); 
+    adjustProjectCardsLayout();
   }
+
 
 
 
@@ -246,7 +247,8 @@
 
   function goToProject(link, projectId) {
     console.log(link);
-    window.location.href = (link + '?id=' + projectId );
+    window.location.href = (link + '?id=' + projectId);
+
   }
 </script>
 
