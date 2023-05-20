@@ -248,6 +248,7 @@
   function goToProject(link, projectId) {
     console.log(link);
     window.location.href = (link + '?id=' + projectId);
+
   }
 </script>
 
