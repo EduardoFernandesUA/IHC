@@ -12,11 +12,6 @@
     record.editingName = true;
   }
 
-  function saveName(id) {
-    const record = records.find(r => r.id === id);
-    delete record.editingName;
-    record.name = document.getElementById(`name-input-${id}`).value;
-  }
   import { onMount } from 'svelte';
 
   onMount(() => {
@@ -76,9 +71,22 @@
       stream = await navigator.mediaDevices.getUserMedia({ video: true }); // only video, no audio
       const videoElement = document.querySelector('video');
 
-      videoElement.srcObject = stream;
+      let videoPositon = document.getElementById('icon.container');
+
+      videoElement.srcObject = stream; 
 
       recorder = new MediaRecorder(stream);
+
+      // make the video over videoposition
+      videoElement.style.position = 'absolute';
+      videoElement.style.top = '0px';
+      videoElement.style.left = '0px';
+      videoElement.style.width = '100%';
+      videoElement.style.height = '100%';
+      videoElement.style.objectFit = 'cover';
+      
+
+
 
       recorder.addEventListener('dataavailable', event => {
         chunks.push(event.data);
@@ -121,7 +129,6 @@
   async function startRecording() {
     isRecording = true;
     
-
     const startRecord = document.getElementById('record');
     startRecord.style.display = 'none';
 
@@ -157,77 +164,77 @@
     }
 }
 
-  async function stopRecording() {
-    if (recorder && recorder.state === 'recording') {
-      recorder.stop();
-      isRecording = false;
-      console.log('Stopped recording video.');
-      recorder.addEventListener('stop', () => {
-      
-        previewVideo();
-          // if (confirm('Do you want to download the video?')) {
-          //   downloadVideo();
-          // }
-      });
-    }
-  }
-
-  function previewVideo() {
-    const modalVideo = document.getElementById('previewVideo');
-      
-    const blob = new Blob(chunks, { type: 'video/webm' });
-    const videoURL = URL.createObjectURL(blob);
-    console.log(videoURL)
-
-    modalVideo.src = videoURL;
-
-    const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
-    modal.show();
-
-    const downloadButton = document.getElementById('download-button');
-    downloadButton.removeEventListener('click', downloadVideo);
-    downloadButton.addEventListener('click', ()=>downloadVideo(videoURL));
-    
-    const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
-    closeModalButton.removeEventListener('click', () => closeModal(modal));
-
-    const startRecord = document.getElementById('record');
-    startRecord.style.display = 'block';
-  }
-
-  function downloadVideo(url) {
-    const filename = prompt('Enter a name for the video file:', 'recorded-video');
-    if (!filename) {
-      return;
-    }
-
-    const a = document.createElement('a');
-    document.body.appendChild(a);
-    a.style = 'display: none';
-    a.href = url;
-    a.download = filename + '.mp4';
-    //a.click();
-    window.URL.revokeObjectURL(url);
-
-    chunks = [];
-
-    let newRecordClass = document.getElementById('inputGroupSelect02').value;
-
-    const newRecord = {
-      id: records.length + 1,
-      name: filename,
-      class: newRecordClass,
-      duration: duration,
-      url: url
+async function stopRecording() {
+  if (recorder && recorder.state === 'recording') {
+    recorder.stop();
+    isRecording = false;
+    console.log('Stopped recording video.');
+    const stopEventListener = () => {
+      recorder.removeEventListener('stop', stopEventListener); // Remove the event listener
+      previewVideo();
+      // if (confirm('Do you want to download the video?')) {
+      //   downloadVideo();
+      // }
     };
-
-    records.push(newRecord);
-
-    localStorage.setItem('records', JSON.stringify(records));
-
-    closeModal();
-    renderRecords();
+    recorder.addEventListener('stop', stopEventListener);
   }
+}
+
+function previewVideo() {
+  const modalVideo = document.getElementById('previewVideo');
+  const blob = new Blob(chunks, { type: 'video/webm' });
+  const videoURL = URL.createObjectURL(blob);
+  console.log(videoURL)
+
+  modalVideo.src = videoURL;
+
+  const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
+  modal.show();
+
+  const downloadButton = document.getElementById('download-button');
+  downloadButton.removeEventListener('click', downloadVideo);
+
+  // Prompt for filename before calling downloadVideo
+  const filename = prompt('Enter a name for the video file:', 'recorded-video');
+  if (filename) {
+    downloadButton.addEventListener('click', () => downloadVideo(videoURL, filename));
+  }
+
+  const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
+  closeModalButton.removeEventListener('click', () => closeModal(modal));
+
+  const startRecord = document.getElementById('record');
+  startRecord.style.display = 'block';
+}
+
+function downloadVideo(url, filename) {
+  const a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style = 'display: none';
+  a.href = url;
+  a.download = filename + '.webm';
+  //a.click();
+  window.URL.revokeObjectURL(url);
+
+  chunks = [];
+
+  let newRecordClass = document.getElementById('inputGroupSelect02').value;
+
+  const newRecord = {
+    id: records.length + 1,
+    name: filename,
+    class: newRecordClass,
+    duration: duration,
+    url: url
+  };
+
+  records.push(newRecord);
+
+  localStorage.setItem('records', JSON.stringify(records));
+
+  closeModal();
+  renderRecords();
+}
 
 
   function renderRecords() {
@@ -301,15 +308,6 @@
       editButton.appendChild(editIcon);
       editButton.setAttribute('title', 'Edit Video Elements');
 
-      const featureButton = document.createElement('button');
-      featureButton.setAttribute('class', 'btn btn-dark');
-      featureButton.addEventListener('click', () => featureRecord(record.id));
-      const featureIcon = document.createElement('i');
-      featureIcon.setAttribute('class', 'fas fa-star');
-      featureButton.style.marginRight = '5px';
-      featureButton.appendChild(featureIcon);
-      featureButton.setAttribute('title', 'Extract Features');
-
       const previewCell = document.createElement('td');
       const previewButton = document.createElement('button');
       previewButton.setAttribute('class', 'btn btn-dark');
@@ -323,7 +321,6 @@
       actionsCell.appendChild(deleteButton);
       actionsCell.appendChild(editButton);
       actionsCell.appendChild(previewButton);
-      actionsCell.appendChild(featureButton);
       tableRow.appendChild(actionsCell);
       tableBody.appendChild(tableRow);
 
@@ -338,42 +335,39 @@
     }
   }
 
-  function previewRecord(id) {
-    // const record = records.find(r => r.id === id);
-    // const recordChunks = record.chunks;
-    // const blob = new Blob(recordChunks, { type: 'video/webm' });
-    // const videoURL = URL.createObjectURL(blob);
-    let videoURL = JSON.parse(localStorage.getItem('records'))
-    console.log(videoURL)
-    videoURL = videoURL.find((e)=>e['id']==id)['url']
-
-    const modalVideo = document.getElementById('previewVideo');
-    modalVideo.src = videoURL;
-
-    const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
-    modal.show();
-
-    const downloadButton = document.getElementById('download-button');
-    downloadButton.removeEventListener('click', downloadVideo);
-    downloadButton.addEventListener('click', downloadVideo);
-
-    const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
-    closeModalButton.removeEventListener('click', closeModal);
-    closeModalButton.addEventListener('click', () => closeModal(modal));
-
-    const startRecord = document.getElementById('record');
-    startRecord.style.display = 'block';
-  }
-
   function deleteRecord(id) {
-    const index = records.findIndex(record => record.id === id);
+  const index = records.findIndex(record => record.id === id);
 
-    if (index !== -1) {
-      records.splice(index, 1);
-      localStorage.setItem('records', JSON.stringify(records));
-      renderRecords(); // Update the table display
-    }
+  if (index !== -1) {
+    records.splice(index, 1);
+    localStorage.setItem('records', JSON.stringify(records));
+    renderRecords(); // Update the table display
   }
+}
+
+
+  function previewRecord(id) {
+  const record = records.find(r => r.id === id);
+  const videoURL = record.url;
+
+  const modalVideo = document.getElementById('previewVideo');
+  modalVideo.src = videoURL;
+
+  const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
+  modal.show();
+
+  const downloadButton = document.getElementById('download-button');
+  downloadButton.removeEventListener('click', downloadVideo);
+  downloadButton.addEventListener('click', () => downloadVideo(videoURL));
+
+  const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
+  closeModalButton.removeEventListener('click', closeModal);
+  closeModalButton.addEventListener('click', () => closeModal(modal));
+
+  const startRecord = document.getElementById('record');
+  startRecord.style.display = 'block';
+}
+
 
   function editRecord(id) {
     const record = records.find(r => r.id === id);
@@ -447,10 +441,8 @@
 
 </script>
 
-
 <div class="row">
 	<div class="col-3"  style="margin-right: 100px;">
-  
 		<form>
 			<fieldset>
         <h5 class="my-4">Options:</h5>
@@ -479,25 +471,26 @@
         {/if} 
 				<button id="record" type="submit" class="btn btn-dark w-100 text-center mt-2" on:click={startRecording}>Record</button>
        
-      
-
+  
         <br>
         <p id="count-down-text" style="text-align:center"></p>
         <p id="recording-text" style="text-align:center"></p>
 	    </fieldset>
 		</form>
 	</div>
+
 	<div class="col-8 bg-dark" style="height:{height}" bind:offsetWidth={width}>
     <div class="icon-container">
-      <video width="2640" height="480" style="height:{height}" bind:offsetWidth={width} autoplay muted></video>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      {#if !isPlaying}
-        <!-- <img id="play" src="/src/routes/img/play.png" alt="Icon" class="icon" style="" on:click={openCamera}>
+        <video width="2640" height="480" style="height:{height}" bind:offsetWidth={width} autoplay muted></video>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        {#if !isPlaying}
+          <!-- <img id="play" src="/src/routes/img/play.png" alt="Icon" class="icon" style="" on:click={openCamera}>
 
- <button id="play" class="icon" style="display: flex; justify-content: center; align-items: center;margin-right:880px;margin-top:170px;" on:click={openCamera}>Start Camera</button> -->
-      {:else}
-        <!-- <img id="pause" src="/src/routes/img/stop.png" alt="Icon" class="icon" style="display: flex; justify-content: center; align-items: center;" on:click={stopCamera}> -->
-      {/if} </div>
+            <button id="play" class="icon" style="display: flex; justify-content: center; align-items: center;margin-right:880px;margin-top:170px;" on:click={openCamera}>Start Camera</button> -->
+        {:else}
+          <!-- <img id="pause" src="/src/routes/img/stop.png" alt="Icon" class="icon" style="display: flex; justify-content: center; align-items: center;" on:click={stopCamera}> -->
+        {/if} </div>
+    </div>
   </div>
   
  
@@ -520,10 +513,6 @@
     </div>
   </div>
   
-  
-  
-  
-</div>
 
 <hr class="my-4">
 
@@ -555,9 +544,6 @@
             <button class="btn btn-dark" on:click={() => previewRecord(record.id)}>
               <i class="fas fa-eye"></i>
             </button>
-            <button class="btn btn-dark" on:click={() => extractFeatures(record.id)}>
-              <i class="fas fa-star"></i>
-            </button>
           </td>
         </tr>
       {/each}
@@ -570,11 +556,6 @@
 
 <style>
    
-  .icon-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
 
   #play {
     display: block;
