@@ -106,6 +106,7 @@
     }
     const bgBlackElement = document.querySelector('.bg-black');
     if (bgBlackElement) {
+      
       bgBlackElement.style.display = 'block';
     }
 

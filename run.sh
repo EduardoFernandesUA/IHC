@@ -1,7 +1,7 @@
 #!/bin/bash
 
-fuser 5000/tcp -k
-fuser 5173/tcp -k
+lsof -ti:5000 | xargs kill
+lsof -ti:5173 | xargs kill
 
 cd mediapipe
 source venv/bin/activate
