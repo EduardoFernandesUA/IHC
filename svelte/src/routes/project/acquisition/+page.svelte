@@ -575,7 +575,6 @@
     justify-content: center;
     align-items: center;
     
-  }
 
   #play {
     display: block;
