@@ -236,12 +236,11 @@ function downloadVideo(url, filename) {
   renderRecords();
 }
 
-
   function renderRecords() {
     const tableBody = document.querySelector('tbody');
     tableBody.innerHTML = ''; // Clear the existing rows
 
-    for (const record of records) {
+    for (const record of records) { 
       const tableRow = document.createElement('tr');
       tableRow.setAttribute('id', `record-${record.id}`);
 
@@ -265,24 +264,6 @@ function downloadVideo(url, filename) {
       classCell.appendChild(classText);
       tableRow.appendChild(classCell);
 
-      // const thumbsUpOption = document.createElement('option');
-      // thumbsUpOption.value = 'ThumbsUp';
-      // thumbsUpOption.textContent = 'ThumbsUp';
-      // classSelect.appendChild(thumbsUpOption);
-
-      // const thumbsDownOption = document.createElement('option');
-      // thumbsDownOption.value = 'ThumbsDown';
-      // thumbsDownOption.textContent = 'ThumbsDown';
-      // classSelect.appendChild(thumbsDownOption);
-
-      // const peaceSignOption = document.createElement('option');
-      // peaceSignOption.value = 'PeaceSign';
-      // peaceSignOption.textContent = 'Peace';
-      // classSelect.appendChild(peaceSignOption);
-
-      // classCell.appendChild(classSelect);
-      tableRow.appendChild(classCell);
-
       const durationCell = document.createElement('td');
       durationCell.textContent = record.duration;
       tableRow.appendChild(durationCell);
@@ -297,7 +278,6 @@ function downloadVideo(url, filename) {
       deleteButton.style.marginLeft = '50px';
       deleteButton.appendChild(deleteIcon);
       deleteButton.setAttribute('title', 'Delete Video');
-
 
       const editButton = document.createElement('button');
       editButton.setAttribute('class', 'btn btn-dark');
@@ -321,8 +301,11 @@ function downloadVideo(url, filename) {
       actionsCell.appendChild(deleteButton);
       actionsCell.appendChild(editButton);
       actionsCell.appendChild(previewButton);
-      tableRow.appendChild(actionsCell);
-      tableBody.appendChild(tableRow);
+      
+    
+      if(record.name == 'undefined'){
+        deleteRecord(record.id); 
+      } 
 
     }
 
@@ -336,37 +319,37 @@ function downloadVideo(url, filename) {
   }
 
   function deleteRecord(id) {
-  const index = records.findIndex(record => record.id === id);
+    const index = records.findIndex(record => record.id === id);
 
-  if (index !== -1) {
-    records.splice(index, 1);
-    localStorage.setItem('records', JSON.stringify(records));
-    renderRecords(); // Update the table display
+    if (index !== -1) {
+      records.splice(index, 1);
+      localStorage.setItem('records', JSON.stringify(records));
+      renderRecords(); // Update the table display
+    }
   }
-}
 
 
   function previewRecord(id) {
-  const record = records.find(r => r.id === id);
-  const videoURL = record.url;
+    const record = records.find(r => r.id === id);
+    const videoURL = record.url;
 
-  const modalVideo = document.getElementById('previewVideo');
-  modalVideo.src = videoURL;
+    const modalVideo = document.getElementById('previewVideo');
+    modalVideo.src = videoURL;
 
-  const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
-  modal.show();
+    const modal = new bootstrap.Modal(document.getElementById('previewVideoModal'));
+    modal.show();
 
-  const downloadButton = document.getElementById('download-button');
-  downloadButton.removeEventListener('click', downloadVideo);
-  downloadButton.addEventListener('click', () => downloadVideo(videoURL));
+    const downloadButton = document.getElementById('download-button');
+    downloadButton.removeEventListener('click', downloadVideo);
+    downloadButton.addEventListener('click', () => downloadVideo(videoURL));
 
-  const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
-  closeModalButton.removeEventListener('click', closeModal);
-  closeModalButton.addEventListener('click', () => closeModal(modal));
+    const closeModalButton = document.querySelector('#previewVideoModal .btn-close');
+    closeModalButton.removeEventListener('click', closeModal);
+    closeModalButton.addEventListener('click', () => closeModal(modal));
 
-  const startRecord = document.getElementById('record');
-  startRecord.style.display = 'block';
-}
+    const startRecord = document.getElementById('record');
+    startRecord.style.display = 'block';
+  }
 
 
   function editRecord(id) {
