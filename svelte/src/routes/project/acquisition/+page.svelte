@@ -1,9 +1,6 @@
 <script lang='ts'>
   let width: number, height: string;
 
-  
-
-  
   let records = [
   ];
 
@@ -220,8 +217,10 @@ function downloadVideo(url, filename) {
 
   let newRecordClass = document.getElementById('inputGroupSelect02').value;
 
+  let newRecordid = records.length + 1;
+
   const newRecord = {
-    id: records.length + 1,
+    id: newRecordid,
     name: filename,
     class: newRecordClass,
     duration: duration,
@@ -239,6 +238,9 @@ function downloadVideo(url, filename) {
   function renderRecords() {
     const tableBody = document.querySelector('tbody');
     tableBody.innerHTML = ''; // Clear the existing rows
+
+    // create an array to store the records that are already listed on the table
+    const recordsOnTable = [];
 
     for (const record of records) { 
       const tableRow = document.createElement('tr');
@@ -302,21 +304,21 @@ function downloadVideo(url, filename) {
       actionsCell.appendChild(editButton);
       actionsCell.appendChild(previewButton);
       
+      tableRow.appendChild(actionsCell);
+      tableBody.appendChild(tableRow);
+
+      recordsOnTable.push(record.id);
+      console.log(recordsOnTable)
     
       if(record.name == 'undefined'){
         deleteRecord(record.id); 
       } 
 
     }
-
     localStorage.setItem('records', JSON.stringify(records));
-
-    if (localStorage.getItem('records') === JSON.stringify(records)) {
-      console.log('Records saved successfully in local storage.');
-    } else {
-      console.log('Failed to save records in local storage.');
-    }
   }
+
+  
 
   function deleteRecord(id) {
     const index = records.findIndex(record => record.id === id);
