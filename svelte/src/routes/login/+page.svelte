@@ -40,7 +40,7 @@
         <div class="row g-0 align-items-center justify-content-center">
 
         
-        <div class="col-lg-6 mb-5 mb-lg-0">
+        <div class="col-lg-6 mb-5 mb-lg-0" style="margin-top:180px">
             
         
             <div class="card cascading-right" style="

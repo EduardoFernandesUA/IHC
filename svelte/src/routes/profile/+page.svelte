@@ -3,17 +3,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
 
-<div class="container my-2">
+<div class="container my-2" style="margin-top:100px"> 
 	<br>
 	<h2 style="text-align:center;color: black">Your Profile 
 		<span class="material-icons" style="cursor: pointer;font-size: 1.5rem;" on:click={editProfile}>edit</span>
 	</h2>
 
-	<div style="text-align:center;margin-top:15px"class="container">
+	<div style="text-align:center;margin-top:20px"class="container">
 		<div class="row justify-content-center">
 			<div class="card-client">
 				<div class="user-picture">
-					<img src="/vitruviano.jpeg" alt="vitruviano" style="width:100%;height:100%;" />
+					<img src="/veloso.jpg" alt="vitruviano" style="width:100%;height:100%;" />
 				</div>
 				<p class="name-client">
 					<span id="name-container">Rui Veloso</span><br>
