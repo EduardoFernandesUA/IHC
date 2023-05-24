@@ -12,15 +12,29 @@
             if(users['usr'] == usr && users['password'] == password){
                 window.location.href='/'
             }
-        
+            else {
+                showAlert("Unkown username or password, try again!");
+            }
+    }
 
+    let message = "";
+
+
+    function showAlert(msg) {
+        setTimeout(() => {
+            message = "";
+        }, 3000);
+        message = msg;
     }
 </script>
 
 <section class="text-center text-lg-start">
 	<div class="container my-2">
+        {#if message}
+            <div class="alert">{message}</div>
+        {/if}
 		<br>
-		<h2 style="text-align:center;color: black">Login/Register</h2>
+
     <!-- Jumbotron -->
     <div class="container py-5" >
         <div class="row g-0 align-items-center justify-content-center">
@@ -55,14 +69,14 @@
                         <!-- Username input -->
 						<div class="form-outline mb-4">
 							<label class="form-label" for="loginName">Username</label>
-							<input id="formSigninUsername" type="text" class="form-control" />
+							<input id="formSigninUsername" type="text" class="form-control" style="text-align: center;"/>
 						</div>
 						
 
                         <!-- Password input -->
                         <div class="form-outline mb-4">
 							<label class="form-label" for="loginPassword">Password</label>
-							<input id="formSigninPassword" type="password" class="form-control" />
+							<input id="formSigninPassword" type="password" class="form-control" style="text-align: center;"/>
                 		</div>
 
                 <!-- 2 column grid layout -->
@@ -183,6 +197,15 @@
 		border-radius: 10px;
 	}
 
+    .alert {
+        background-color: red;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        margin-top: 10px;
+        width: 100%;
+
+    }
 
 
 </style>   
