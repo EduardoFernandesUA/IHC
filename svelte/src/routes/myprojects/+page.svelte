@@ -1,4 +1,14 @@
 <link rel="stylesheet" href="src/routes/myprojects/styles.css">
+<style>
+  .delete-button {
+  background-color: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+
+</style>
 <script lang='ts'>
 	import { onMount } from 'svelte';
 
@@ -175,10 +185,7 @@
     const projectCard = document.createElement("div");
     projectCard.classList.add("col");
 
-    const cardContainer = document.createElement("div");
-    cardContainer.classList.add("card", "h-100");
-    cardContainer.style.cursor = "pointer";
-    cardContainer.addEventListener("click", () => goToProject(project.link, project.id));
+
 
     const cardBody = document.createElement("div");
     cardBody.classList.add("card-body", "p-0", "m-0");
@@ -210,9 +217,33 @@
     projectButton.textContent = "Go to Project";
     projectButton.addEventListener("click", () => goToProject(project.link, project.id));
 
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete-button");
+    deleteButton.style.height = "30px";
+    deleteButton.style.marginTop = "10px";
+    deleteButton.textContent = "Delete";
+    deleteButton.style.backgroundColor = "red";
+    deleteButton.style.color = "white";
+    deleteButton.style.border = "none";
+    deleteButton.style.cursor = "pointer";
+    deleteButton.style.marginLeft = "5px";
+    deleteButton.addEventListener("click", (event) => {
+      event.stopPropagation(); // Prevent event propagation
+      deleteProject(projects.indexOf(project));
+    });
+
+    const cardContainer = document.createElement("div");
+    cardContainer.classList.add("card", "h-100");
+    cardContainer.style.cursor = "pointer";
+    cardContainer.addEventListener("click", () => goToProject(project.link, project.id));
+
+    cardContainer.appendChild(deleteButton);
+
+
     contentColumn.appendChild(projectNameElement);
     contentColumn.appendChild(projectDescriptionElement);
     contentColumn.appendChild(projectButton);
+    contentColumn.appendChild(deleteButton);
 
     imageColumn.appendChild(image);
 
@@ -231,6 +262,14 @@
     adjustProjectCardsLayout();
   }
 
+  function deleteProject(index) {
+    if (confirm('Are you sure you want to delete this project?')) {
+      projects.splice(index, 1);
+      localStorage.setItem('projects', JSON.stringify(projects));
+      adjustProjectCardsLayout();
+      location.reload();
+    }
+  }
 
   function adjustProjectCardsLayout() {
     
@@ -372,7 +411,9 @@
                     <button class="project-info-button" style="height: 30px" on:click={() => goToProject(project.link, project.id)}>
                       Go to Project
                     </button>
-                    
+                    <button class="delete-button" style="height: 30px; margin-top: 10px" on:click={() => deleteProject(index)}>
+                      Delete
+                    </button>
                   </div>
                 </div>
               </div>
